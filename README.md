@@ -1,21 +1,22 @@
-# vector со small-object и copy-on-write оптимизациями
+# vector with small-object and copy-on-write optimizations
 
-В этом задании необходимо реализовать класс аналогичный `std::vector`, но имеющий *small-object* и *copy-on-write* оптимизации.
+(С++ course homework)
 
-*small-object* предполагает, что вектор умеет хранить небольшое число элементов без динамической аллокации памяти. *copy-on-write* предполагает, что копирование/присваивание больших векторов не копирует все элементы само, а откладывает копирование элементов до момента когда к объекту применят модифицирующую операцию.
+In this task, you need to implement a class similar to `std::vector`, but with *small-object* and *copy-on-write* optimizations.
 
-Реализуемый класс должен называться `socow_vector` и лежать в хедере `socow-vector.h`. Он должен иметь два шаблонных параметра: тип хранимых объектов и размер маленького буффера.
+*small-object* implies that the vector can store a small number of elements without dynamic memory allocation. *copy-on-write* implies that copying/assigning large vectors does not copy all elements themselves, but postpones copying of the elements until a modifying operation is applied to the object.
+
+The class to be implemented should be named `socow_vector` and should be in the header `socow-vector.h`. It should have two template parameters: the type of the objects stored and the size of the small buffer.
 
 ```cpp
 template <typename T, size_t SMALL_SIZE>
 struct socow_vector;
 ```
 
-Из-за наличия  *small-object* и *copy-on-write* оптимизаций, некоторые операции имеют другую вычислительную сложность и/или предоставляют другую гарантию безопасности исключений:
+Due to the presence of *small-object* and *copy-on-write* optimizations, some operations have different computational complexity and/or provide different guarantees of exception safety:
 
-* Конструктор копирования и оператор присваивания должны работать за `O(SMALL_SIZE)`, а не за `O(size)`.
-* Если размеры и `a` и `b` меньше `SMALL_SIZE`, `swap(a, b)` должен предоставлять базовую гарантию безопасности исключений, иначе – сильную.
-* Если размеры и `a` и `b` меньше `SMALL_SIZE`, `a = b` должен предоставлять базовую гарантию безопасности исключений, иначе – сильную.
-* Неконстантные операции `operator[]`, `data()`, `front()`, `back()`, `pop_back()`, `begin()`, `end()` должны работать за O(size) и удовлетворять сильной гарантии безопасности исключений, если требуется копирование для *copy-on-write*, и за O(1) и nothrow иначе.
-* Как и со стандартным вектором, `reserve` должен гарантировать, что после выполения `reserve(n)` вставки в вектор не будут приводить к переаллокациям, пока размер <= `n`.
-
+* Copy constructor and assignment operator should work for `O(SMALL_SIZE)`, not `O(size)`.
+* If the sizes of both `a` and `b` are less than `SMALL_SIZE`, `swap(a, b)` should provide the basic guarantee of exception safety, otherwise – the strong guarantee.
+* If the sizes of both `a` and `b` are less than `SMALL_SIZE`, `a = b` should provide the basic guarantee of exception safety, otherwise – the strong guarantee.
+* Non-constant operations like `operator[]`, `data()`, `front()`, `back()`, `pop_back()`, `begin()`, `end()` should work for O(size) and satisfy the strong guarantee of exception safety if copying for *copy-on-write* is required, and for O(1) and nothrow otherwise.
+* Just like with the standard vector, `reserve` should guarantee that after executing `reserve(n)`, insertions into the vector will not lead to reallocations as long as the size <= `n`.
